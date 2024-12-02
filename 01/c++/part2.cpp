@@ -57,9 +57,6 @@ int main() {
     second.push_back(b);
   }
 
-  std::sort(first.begin(), first.end());
-  std::sort(second.begin(), second.end());
-
   std::int64_t similarity = 0;
 
   for (std::size_t index = 0; index < first.size(); ++index) {
