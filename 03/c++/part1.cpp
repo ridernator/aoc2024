@@ -43,20 +43,18 @@ std::vector<std::string> readFileToVector(const std::string& filename = INPUT) {
 }
 
 int main() {
-  const auto& lines = readFileToVector();
+  const std::regex mulRegex("mul\\([0-9]+,[0-9]+\\)");
+
+  const auto& line = readFile().str();
 
   std::int64_t num1;
   std::int64_t num2;
   std::int64_t sum = 0;
 
-  for (const auto& line : lines) {
-    std::regex word_regex("mul\\([0-9]+,[0-9]+\\)");
+  for (auto iterator = std::sregex_iterator(line.begin(), line.end(), mulRegex); iterator != std::sregex_iterator(); ++iterator) {
+    sscanf(iterator->str().c_str(), "mul(%li,%li)", &num1, &num2);
 
-    for (auto iterator = std::sregex_iterator(line.begin(), line.end(), word_regex); iterator != std::sregex_iterator(); ++iterator) {
-      sscanf(iterator->str().c_str(), "mul(%li,%li)", &num1, &num2);
-
-      sum += num1 * num2;
-    }
+    sum += num1 * num2;
   }
 
   std::cout << "Sum of multiplications = " << sum << std::endl;
