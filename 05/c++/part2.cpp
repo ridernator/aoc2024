@@ -80,17 +80,16 @@ int main() {
     manuals.push_back(manual);
   }
 
-  std::uint64_t wellOrderedSum = 0;
   bool wellOrdered;
 
-  for (const auto& manual : manuals) {
+  for (auto iter = manuals.begin(); iter != manuals.end(); ++iter) {
     wellOrdered = true;
 
-    for (std::size_t page = 0; page < manual.size(); ++page) {
+    for (std::size_t page = 0; page < iter->size(); ++page) {
       for (const auto& rule : rules) {
-        if (rule.before == manual[page]) {
+        if (rule.before == iter->at(page)) {
           for (std::size_t index = 0; index < page; ++index) {
-            if (manual[index] == rule.after) {
+            if (iter->at(index) == rule.after) {
               wellOrdered = false;
 
               break;
@@ -109,9 +108,51 @@ int main() {
     }
 
     if (wellOrdered) {
-      wellOrderedSum += manual[manual.size() / 2];
+      iter = manuals.erase(iter) - 1;
     }
   }
 
-  std::cout << "Sum of centre pages of well-ordered manuals = " << wellOrderedSum << std::endl;
+  std::uint64_t tempPage;
+
+  for (auto& manual : manuals) {
+    wellOrdered = false;
+
+    while (!wellOrdered) {
+      wellOrdered = true;
+
+      for (std::size_t page = 0; page < manual.size(); ++page) {
+        for (const auto& rule : rules) {
+          if (rule.before == manual[page]) {
+            for (std::size_t index = 0; index < page; ++index) {
+              if (manual[index] == rule.after) {
+                wellOrdered = false;
+
+                tempPage = manual[index];
+                manual[index] = manual[page];
+                manual[page] = tempPage;
+
+                break;
+              }
+            }
+
+            if (!wellOrdered) {
+              break;
+            }
+          }
+        }
+
+        if (!wellOrdered) {
+          break;
+        }
+      }
+    }
+  }
+
+  std::uint64_t centres = 0;
+
+  for (auto& manual : manuals) {
+    centres += manual[manual.size() / 2];
+  }
+
+  std::cout << "Sum of centre pages = " << centres << std::endl;
 }
