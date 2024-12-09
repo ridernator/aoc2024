@@ -89,14 +89,6 @@ int main() {
               (antinode.y >= 0) && (antinode.y < maxY)) {
             antinodes.insert(antinode);
           }
-
-          antinode.x = position1.x - (2 * (position1.x - position2.x));
-          antinode.y = position1.y - (2 * (position1.y - position2.y));
-
-          if ((antinode.x >= 0) && (antinode.x < maxX) &&
-              (antinode.y >= 0) && (antinode.y < maxY)) {
-            antinodes.insert(antinode);
-          }
         }
       }
     }
