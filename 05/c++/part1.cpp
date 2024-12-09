@@ -25,11 +25,6 @@ std::stringstream readFile(const std::string& filename = INPUT) {
   return returnVal;
 }
 
-struct Rule {
-  std::uint64_t before;
-  std::uint64_t after;
-};
-
 /**
  * Read a file entirely into a vector of strings
  *
@@ -47,6 +42,11 @@ std::vector<std::string> readFileToVector(const std::string& filename = INPUT) {
 
   return returnVal;
 }
+
+struct Rule {
+  std::uint64_t before;
+  std::uint64_t after;
+};
 
 int main() {
   const auto& data = readFileToVector();
