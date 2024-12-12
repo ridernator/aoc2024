@@ -6,7 +6,6 @@
 #include <cstring>
 #include <iostream>
 #include <limits>
-#include <list>
 #include <map>
 #include <string>
 #include <sstream>

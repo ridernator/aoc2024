@@ -59,7 +59,7 @@ static const std::array<std::uint64_t, 10> POWS = {(std::uint64_t) std::pow(10, 
                                                    (std::uint64_t) std::pow(10, 8),
                                                    (std::uint64_t) std::pow(10, 9)};
 
-std::uint64_t calculate(const std::uint64_t number,
+std::uint64_t calculateNumStones(const std::uint64_t number,
                         const std::uint64_t depth,
                         const std::uint64_t maxDepth) {
   if (depth == maxDepth) {
@@ -67,7 +67,7 @@ std::uint64_t calculate(const std::uint64_t number,
   }
 
   if (number == 0) {
-    return calculate(1, depth + 1, maxDepth);
+    return calculateNumStones(1, depth + 1, maxDepth);
   }
 
   std::uint64_t numDigits = (std::uint64_t) log10(number) + 1;
@@ -75,9 +75,9 @@ std::uint64_t calculate(const std::uint64_t number,
   if (numDigits % 2 == 0) {
     std::uint64_t splitter = POWS[numDigits / 2];
 
-    return calculate(number % splitter, depth + 1, maxDepth) + calculate(number / splitter, depth + 1, maxDepth);
+    return calculateNumStones(number % splitter, depth + 1, maxDepth) + calculateNumStones(number / splitter, depth + 1, maxDepth);
   } else {
-    return calculate(number * 2024, depth + 1, maxDepth);
+    return calculateNumStones(number * 2024, depth + 1, maxDepth);
   }
 }
 
@@ -88,7 +88,7 @@ int main() {
   std::uint64_t numStones = 0;
 
   while (std::getline(data, tempString, ' ')) {
-    numStones += calculate(std::strtoul(tempString.c_str(), nullptr, 10), 0, maxBlinks);
+    numStones += calculateNumStones(std::strtoul(tempString.c_str(), nullptr, 10), 0, maxBlinks);
   }
 
   std::cout << "Number of stones after " << maxBlinks << " blinks = " << numStones << std::endl;
