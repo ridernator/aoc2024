@@ -132,10 +132,10 @@ int main() {
     perimeter = getPerimeter(region);
     fencingCost += perimeter * region.size();
 
-    std::cout << "Region " << region[0]->value << ", area " << region.size() << ", perimeter " << perimeter << std::endl;
+    // std::cout << "Region " << region[0]->value << ", area " << region.size() << ", perimeter " << perimeter << std::endl;
   }
 
-  // std::cout << "Total fencing cost = " << fencingCost << std::endl;
+  std::cout << "Total fencing cost = " << fencingCost << std::endl;
 
   for (std::int64_t y = 0; y < (std::int64_t) lines.size(); ++y) {
     for (std::int64_t x = 0; x < (std::int64_t) lines[0].size(); ++x) {
