@@ -44,41 +44,65 @@ std::vector<std::string> readFileToVector(const std::string& filename = INPUT) {
   return returnVal;
 }
 
+// AXa + BXb = Xp
+// AYa + BYb = Yp
+//
+// AXa = Xp - BXb
+// AYa = Yp - BYb
+//
+// A = (Xp - BXb) / Xa
+// A = (Yp - BYb) / Ya
+//
+// (Xp - BXb) / Xa = (Yp - BYb) / Ya
+// Xp - BXb = Xa * (Yp - BYb) / Ya
+// (Xp - BXb) * Ya = (Yp - BYb) * Xa
+// YaXp - YaBXb = XaYp - XaBYb
+// XaBYb - YaBXb = XaYp - YaXp
+// B(XaYb - YaXb) = XaYp - YaXp
+// ####### B = (XaYp - YaXp) / (XaYb - YaXb)
+//
+// AXa + BXb = Xp
+// AYa + BYb = Yp
+//
+// BXb = Xp - AXa
+// BYb = Yp - AYa
+//
+// B = (Xp - AXa) / Xb
+// B = (Yp - AYa) / Yb
+//
+// Yb * (Xp - AXa) = Xb * (Yp - AYa)
+// YbXp - YbAXa = XbYp - XbAYa
+// XbAYa - YbAXa = XbYp - YbXp
+// A(XbYa - YbXa) = XbYp - YbXp
+// ###### A = (XbYp - YbXp) / (XbYa - YbXa)
+
 int main() {
   const auto& lines = readFileToVector();
-  std::uint64_t aX;
-  std::uint64_t aY;
-  std::uint64_t bX;
-  std::uint64_t bY;
-  std::uint64_t pX;
-  std::uint64_t pY;
-  std::uint64_t aCost = 3;
-  std::uint64_t bCost = 1;
-  std::uint64_t maxPresses = 100;
-  bool found;
-  std::uint64_t sum = 0;
+  std::int64_t Xa;
+  std::int64_t Ya;
+  std::int64_t Xb;
+  std::int64_t Yb;
+  std::int64_t Xp;
+  std::int64_t Yp;
+  std::int64_t aCost = 3;
+  std::int64_t bCost = 1;
+  std::int64_t sum = 0;
+  std::int64_t a;
+  std::int64_t b;
 
   for (std::size_t index = 0; index < lines.size(); index += 4) {
-    sscanf(lines[index].c_str(), "Button A: X+%lu, Y+%lu", &aX, &aY);
-    sscanf(lines[index + 1].c_str(), "Button B: X+%lu, Y+%lu", &bX, &bY);
-    sscanf(lines[index + 2].c_str(), "Prize: X=%lu, Y=%lu", &pX, &pY);
+    sscanf(lines[index].c_str(), "Button A: X+%li, Y+%li", &Xa, &Ya);
+    sscanf(lines[index + 1].c_str(), "Button B: X+%li, Y+%li", &Xb, &Yb);
+    sscanf(lines[index + 2].c_str(), "Prize: X=%li, Y=%li", &Xp, &Yp);
 
-    found = false;
+    // A = (XbYp - YbXp) / (XbYa - YbXa)
+    a = (Xb * Yp - Yb * Xp) / (Xb * Ya - Yb * Xa);
 
-    for (std::uint64_t aCount = 0; aCount < maxPresses; ++aCount) {
-      if ((found) || (aCount * aX > pX) || (aCount * aY > pY)) {
-        break;
-      }
+    // B = (XaYp - YaXp) / (XaYb - YaXb)
+    b = (Xa * Yp - Ya * Xp) / (Xa * Yb - Ya * Xb);
 
-      for (std::uint64_t bCount = 0; bCount < maxPresses; ++bCount) {
-        if ((aCount * aX + bCount * bX > pX) || (aCount * aY + bCount * bY > pY)) {
-          break;
-        }
-
-        if ((aCount * aX + bCount * bX == pX) && (aCount * aY + bCount * bY == pY)) {
-          sum += aCount * aCost + bCount * bCost;
-        }
-      }
+    if ((a * Xa + b * Xb == Xp) && (a * Ya + b * Yb == Yp)) {
+      sum += a * aCost + b * bCost;
     }
   }
 
