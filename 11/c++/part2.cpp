@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <limits>
 #include <map>
 #include <string>
 #include <sstream>
@@ -13,8 +12,6 @@
 #include <vector>
 
 #define INPUT "../data/input"
-
-const std::uint64_t EMPTY = std::numeric_limits<std::uint64_t>::max();
 
 /**
  * Read a file entirely into a stringstream
