@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -53,10 +52,12 @@ class Tile {
 
   const bool isWall;
   const bool isEnd;
+  std::int64_t distance = std::numeric_limits<std::int64_t>::max();
+  std::int64_t xVelocity;
+  std::int64_t yVelocity;
 };
 
 void print(Tile*** tiles,
-           Tile* reindeer,
            const std::int64_t maxX,
            const std::int64_t maxY) {
   for (std::int64_t y = 0; y < maxY; ++y) {
@@ -65,8 +66,8 @@ void print(Tile*** tiles,
         std::cout << '#';
       } else if (tiles[y][x]->isEnd) {
         std::cout << 'E';
-      } else if (tiles[y][x] == reindeer) {
-        std::cout << '@';
+      } else if (tiles[y][x]->distance != std::numeric_limits<std::int64_t>::max()) {
+        std::cout << std::to_string(tiles[y][x]->distance);
       } else {
         std::cout << '.';
       }
@@ -78,68 +79,11 @@ void print(Tile*** tiles,
   std::cout << std::endl;
 }
 
-std::int64_t minScore = std::numeric_limits<std::int64_t>::max();
-
-void solve(Tile*** tiles,
-           const std::int64_t reindeerX,
-           const std::int64_t reindeerY,
-           const std::int64_t reindeerVelocityX,
-           const std::int64_t reindeerVelocityY,
-           const std::int64_t currentScore,
-           std::vector<Tile*>& usedTiles) {
-  if (currentScore < minScore) {
-    if (tiles[reindeerY][reindeerX]->isEnd) {
-      if (currentScore < minScore) {
-        minScore = currentScore;
-
-        std::cout << "minScore is now " << minScore << std::endl;
-      }
-    } else {
-      usedTiles.push_back(tiles[reindeerY][reindeerX]);
-
-      if (reindeerVelocityX == 0) {
-        if ((!tiles[reindeerY + reindeerVelocityY][reindeerX]->isWall) &&
-            (std::find(usedTiles.begin(), usedTiles.end(), tiles[reindeerY + reindeerVelocityY][reindeerX]) == usedTiles.end())) {
-          solve(tiles, reindeerX, reindeerY + reindeerVelocityY, reindeerVelocityX, reindeerVelocityY, currentScore + 1, usedTiles);
-        }
-
-        if ((!tiles[reindeerY][reindeerX + 1]->isWall) &&
-            (std::find(usedTiles.begin(), usedTiles.end(), tiles[reindeerY][reindeerX + 1]) == usedTiles.end())) {
-          solve(tiles, reindeerX + 1, reindeerY, 1, 0, currentScore + 1001, usedTiles);
-        }
-
-        if ((!tiles[reindeerY][reindeerX - 1]->isWall) &&
-            (std::find(usedTiles.begin(), usedTiles.end(), tiles[reindeerY][reindeerX - 1]) == usedTiles.end())) {
-          solve(tiles, reindeerX - 1, reindeerY, -1, 0, currentScore + 1001, usedTiles);
-        }
-      } else {
-        if ((!tiles[reindeerY][reindeerX + reindeerVelocityX]->isWall) &&
-            (std::find(usedTiles.begin(), usedTiles.end(), tiles[reindeerY][reindeerX + reindeerVelocityX]) == usedTiles.end())) {
-          solve(tiles, reindeerX + reindeerVelocityX, reindeerY, reindeerVelocityX, reindeerVelocityY, currentScore + 1, usedTiles);
-        }
-
-        if ((!tiles[reindeerY + 1][reindeerX]->isWall) &&
-            (std::find(usedTiles.begin(), usedTiles.end(), tiles[reindeerY + 1][reindeerX]) == usedTiles.end())) {
-          solve(tiles, reindeerX, reindeerY + 1, 0, 1, currentScore + 1001, usedTiles);
-        }
-
-        if ((!tiles[reindeerY - 1][reindeerX]->isWall) &&
-            (std::find(usedTiles.begin(), usedTiles.end(), tiles[reindeerY - 1][reindeerX]) == usedTiles.end())) {
-          solve(tiles, reindeerX, reindeerY - 1, 0, -1, currentScore + 1001, usedTiles);
-        }
-      }
-
-      usedTiles.pop_back();
-    }
-  }
-}
-
 int main() {
   const auto& lines = readFileToVector();
 
   Tile*** tiles = new Tile**[lines.size()];
-  std::int64_t reindeerX = 1;
-  std::int64_t reindeerY = 1;
+  Tile* endTile = nullptr;
 
   for (std::int64_t y = 0; y < (std::int64_t) lines.size(); ++y) {
     tiles[y] = new Tile*[lines[0].size()];
@@ -148,16 +92,76 @@ int main() {
       tiles[y][x] = new Tile((lines[y][x] == '#'), (lines[y][x] == 'E'));
 
       if (lines[y][x] == 'S') {
-        reindeerX = x;
-        reindeerY = y;
+        tiles[y][x]->distance = 0;
+        tiles[y][x]->xVelocity = 1;
+        tiles[y][x]->yVelocity = 0;
+      }
+
+      if (lines[y][x] == 'E') {
+        endTile = tiles[y][x];
       }
     }
   }
 
-  print(tiles, tiles[reindeerY][reindeerX], lines[0].size(), lines.size());
+  print(tiles, lines[0].size(), lines.size());
 
-  std::vector<Tile*> usedTiles;
-  solve(tiles, reindeerX, reindeerY, 1, 0, 0, usedTiles);
+  std::int64_t distance = 0;
+
+  while (endTile->distance == std::numeric_limits<std::int64_t>::max()) {
+    for (std::int64_t y = 0; y < (std::int64_t) lines.size(); ++y) {
+      for (std::int64_t x = 0; x < (std::int64_t) lines[0].size(); ++x) {
+        if (tiles[y][x]->distance == distance) {
+          if (tiles[y][x]->xVelocity == 0) {
+            if ((!tiles[y + tiles[y][x]->yVelocity][x]->isWall) &&
+                (tiles[y + tiles[y][x]->yVelocity][x]->distance > distance + 1)) {
+              tiles[y + tiles[y][x]->yVelocity][x]->distance = distance + 1;
+              tiles[y + tiles[y][x]->yVelocity][x]->yVelocity = tiles[y][x]->yVelocity;
+              tiles[y + tiles[y][x]->yVelocity][x]->xVelocity = 0;
+            }
+
+            if ((!tiles[y][x + 1]->isWall) &&
+                (tiles[y][x + 1]->distance > distance + 1001)) {
+              tiles[y][x + 1]->distance = distance + 1001;
+              tiles[y][x + 1]->xVelocity = 1;
+              tiles[y][x + 1]->yVelocity = 0;
+            }
+
+            if ((!tiles[y][x - 1]->isWall) &&
+                (tiles[y][x - 1]->distance > distance + 1001)) {
+              tiles[y][x - 1]->distance = distance + 1001;
+              tiles[y][x - 1]->xVelocity = -1;
+              tiles[y][x - 1]->yVelocity = 0;
+            }
+          } else {
+            if ((!tiles[y][x + tiles[y][x]->xVelocity]->isWall) &&
+                (tiles[y][x + tiles[y][x]->xVelocity]->distance > distance + 1)) {
+              tiles[y][x + tiles[y][x]->xVelocity]->distance = distance + 1;
+              tiles[y][x + tiles[y][x]->xVelocity]->xVelocity = tiles[y][x]->xVelocity;
+              tiles[y][x + tiles[y][x]->xVelocity]->yVelocity = 0;
+            }
+
+            if ((!tiles[y + 1][x]->isWall) &&
+                (tiles[y + 1][x]->distance > distance + 1001)) {
+              tiles[y + 1][x]->distance = distance + 1001;
+              tiles[y + 1][x]->yVelocity = 1;
+              tiles[y + 1][x]->xVelocity = 0;
+            }
+
+            if ((!tiles[y - 1][x]->isWall) &&
+                (tiles[y - 1][x]->distance > distance + 1001)) {
+              tiles[y - 1][x]->distance = distance + 1001;
+              tiles[y - 1][x]->yVelocity = -1;
+              tiles[y - 1][x]->xVelocity = 0;
+            }
+          }
+        }
+      }
+    }
+
+    ++distance;
+  }
+
+  std::cout << "Best score is " << endTile->distance << std::endl;
 
   for (std::int64_t y = 0; y < (std::int64_t) lines.size(); ++y) {
     for (std::int64_t x = 0; x < (std::int64_t) lines[0].size(); ++x) {
