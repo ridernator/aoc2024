@@ -97,12 +97,12 @@ int main() {
     program.push_back(std::strtoll(tempString.c_str(), nullptr, 10));
   }
 
-  std::int64_t testVal = std::pow(8, 15);
+  std::int64_t testVal = std::pow(8, 1);
   while (programString != outputString) {
     i = 0;
     for (int f = 15; f > 0; --f) {
       if (output[f] != program[f]) {
-        testVal += std::pow(8, f - 1);
+        testVal += std::pow(8, f - 5);
       }
     }
     a = ++testVal;
