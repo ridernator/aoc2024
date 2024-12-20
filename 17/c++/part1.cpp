@@ -66,7 +66,7 @@ int main() {
   sscanf(lines[1].c_str(), "Register B: %li", &b);
   sscanf(lines[2].c_str(), "Register C: %li", &c);
 
-  std::stringstream ss(lines[4].substr(8));
+  std::stringstream ss(lines[4].substr(9));
   std::string tempString;
 
   while (std::getline(ss, tempString, ',')) {
